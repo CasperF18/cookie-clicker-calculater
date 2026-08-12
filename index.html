@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cookie Clicker Bank Calculator</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      max-width: 1120px;
+      margin: 48px auto;
+      padding: 0 20px;
+      line-height: 1.45;
+      background: #17120e;
+      color: #f6ead8;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: #2a2017;
+      border: 1px solid #7a5a36;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.35);
+      min-height: 570px;
+    }
+
+    .calculator-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2 { margin-top: 0; }
+    h1 { font-size: 1.8rem; margin-bottom: 24px; }
+    h2 { font-size: 1.45rem; margin-bottom: 6px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 9px;
+      border: 1px solid #8d6d49;
+      background: #120e0b;
+      color: #fff;
+      font-size: 1.05rem;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #c49a69;
+      box-shadow: 0 0 0 3px rgba(196,154,105,.12);
+    }
+
+    .hint, .small-note {
+      color: #cdbda8;
+      font-size: .9rem;
+    }
+
+    .hint { margin-top: 7px; }
+
+    .results {
+      margin-top: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .result {
+      background: #1d1712;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .result .name {
+      color: #d9c4a8;
+      font-size: .92rem;
+    }
+
+    .result .value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+    }
+
+    .formula {
+      margin-top: auto;
+      padding-top: 22px;
+      border-top: 1px solid #5b4630;
+      color: #d7c6b2;
+      font-size: .94rem;
+    }
+
+    .error {
+      color: #ff9b8e;
+      margin-top: 10px;
+      min-height: 1.3em;
+    }
+
+    .reference-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 570px;
+      max-height: 570px;
+    }
+
+    .reference-head {
+      flex: 0 0 auto;
+      margin-bottom: 12px;
+    }
+
+    .reference-list {
+      overflow-y: auto;
+      padding-right: 7px;
+      border-top: 1px solid #5b4630;
+      border-bottom: 1px solid #5b4630;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 74px 72px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 5px;
+      border-bottom: 1px solid rgba(122,90,54,.28);
+      font-size: .91rem;
+    }
+
+    .row.header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #2a2017;
+      color: #d9c4a8;
+      font-weight: 700;
+      border-bottom: 1px solid #7a5a36;
+    }
+
+    .row:last-child { border-bottom: 0; }
+
+    .number-name {
+      overflow-wrap: anywhere;
+    }
+
+    .abbr {
+      font-weight: 800;
+      color: #f6ead8;
+    }
+
+    .power {
+      color: #cdbda8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reference-foot {
+      margin-top: 12px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 820px) {
+      body { margin-top: 24px; }
+      .layout { grid-template-columns: 1fr; }
+      .card, .reference-card {
+        min-height: auto;
+        max-height: none;
+      }
+      .reference-list { max-height: 520px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <div class="card calculator-card">
+      <h1>🍪 Cookie Clicker Bank Calculator</h1>
+
+      <label for="cps">Current CpS</label>
+      <input id="cps" autofocus placeholder="e.g. 1.362 million, 1.362M, or 1362000">
+      <div class="hint">You can use a full number name or any shorthand shown in the list.</div>
+      <div id="error" class="error"></div>
+
+      <div class="results">
+        <div class="result">
+          <div class="name">Bank needed for max Conjure Baked Goods</div>
+          <div id="normal" class="value">—</div>
+        </div>
+
+        <div class="result">
+          <div class="name">Bank needed while CpS is ×7</div>
+          <div id="frenzy" class="value">—</div>
+        </div>
+      </div>
+
+      <div class="formula">
+        Normal threshold = CpS × 60 × 30 ÷ 0.15 =
+        <strong>CpS × 12,000</strong><br>
+        ×7 CpS threshold = normal threshold × 7 =
+        <strong>CpS × 84,000</strong>
+      </div>
+    </div>
+
+    <div class="card reference-card">
+      <div class="reference-head">
+        <h2>Cookie Clicker number names</h2>
+        <div class="small-note">From million all the way to novemnonagintillion.</div>
+      </div>
+
+      <div class="reference-list" id="referenceList">
+        <div class="row header">
+          <div>Name</div>
+          <div>Short</div>
+          <div>Power</div>
+        </div>
+      </div>
+
+      <div class="reference-foot small-note">
+        The early abbreviations are widely used. For the truly absurd numbers,
+        the shorthand is a consistent calculator shorthand so you do not have
+        to type the entire name.
+      </div>
+    </div>
+  </div>
+
+<script>
+const numberData = [{"name": "million", "abbr": "M", "exp": 6}, {"name": "billion", "abbr": "B", "exp": 9}, {"name": "trillion", "abbr": "T", "exp": 12}, {"name": "quadrillion", "abbr": "Qa", "exp": 15}, {"name": "quintillion", "abbr": "Qi", "exp": 18}, {"name": "sextillion", "abbr": "Sx", "exp": 21}, {"name": "septillion", "abbr": "Sp", "exp": 24}, {"name": "octillion", "abbr": "Oc", "exp": 27}, {"name": "nonillion", "abbr": "No", "exp": 30}, {"name": "decillion", "abbr": "Dc", "exp": 33}, {"name": "undecillion", "abbr": "Ud", "exp": 36}, {"name": "duodecillion", "abbr": "Dd", "exp": 39}, {"name": "tredecillion", "abbr": "Td", "exp": 42}, {"name": "quattuordecillion", "abbr": "Qad", "exp": 45}, {"name": "quindecillion", "abbr": "Qid", "exp": 48}, {"name": "sexdecillion", "abbr": "Sxd", "exp": 51}, {"name": "septendecillion", "abbr": "Spd", "exp": 54}, {"name": "octodecillion", "abbr": "Ocd", "exp": 57}, {"name": "novemdecillion", "abbr": "Nod", "exp": 60}, {"name": "vigintillion", "abbr": "Vg", "exp": 63}, {"name": "unvigintillion", "abbr": "Uvg", "exp": 66}, {"name": "duovigintillion", "abbr": "Dvg", "exp": 69}, {"name": "trevigintillion", "abbr": "Tvg", "exp": 72}, {"name": "quattuorvigintillion", "abbr": "Qavg", "exp": 75}, {"name": "quinvigintillion", "abbr": "Qivg", "exp": 78}, {"name": "sexvigintillion", "abbr": "Sxvg", "exp": 81}, {"name": "septenvigintillion", "abbr": "Spvg", "exp": 84}, {"name": "octovigintillion", "abbr": "Ocvg", "exp": 87}, {"name": "novemvigintillion", "abbr": "Novg", "exp": 90}, {"name": "trigintillion", "abbr": "Tg", "exp": 93}, {"name": "untrigintillion", "abbr": "Utg", "exp": 96}, {"name": "duotrigintillion", "abbr": "Dtg", "exp": 99}, {"name": "tretrigintillion", "abbr": "Ttg", "exp": 102}, {"name": "quattuortrigintillion", "abbr": "Qatg", "exp": 105}, {"name": "quintrigintillion", "abbr": "Qitg", "exp": 108}, {"name": "sextrigintillion", "abbr": "Sxtg", "exp": 111}, {"name": "septentrigintillion", "abbr": "Sptg", "exp": 114}, {"name": "octotrigintillion", "abbr": "Octg", "exp": 117}, {"name": "novemtrigintillion", "abbr": "Notg", "exp": 120}, {"name": "quadragintillion", "abbr": "Qag", "exp": 123}, {"name": "unquadragintillion", "abbr": "Uqag", "exp": 126}, {"name": "duoquadragintillion", "abbr": "Dqag", "exp": 129}, {"name": "trequadragintillion", "abbr": "Tqag", "exp": 132}, {"name": "quattuorquadragintillion", "abbr": "Qaqag", "exp": 135}, {"name": "quinquadragintillion", "abbr": "Qiqag", "exp": 138}, {"name": "sexquadragintillion", "abbr": "Sxqag", "exp": 141}, {"name": "septenquadragintillion", "abbr": "Spqag", "exp": 144}, {"name": "octoquadragintillion", "abbr": "Ocqag", "exp": 147}, {"name": "novemquadragintillion", "abbr": "Noqag", "exp": 150}, {"name": "quinquagintillion", "abbr": "Qig", "exp": 153}, {"name": "unquinquagintillion", "abbr": "Uqig", "exp": 156}, {"name": "duoquinquagintillion", "abbr": "Dqig", "exp": 159}, {"name": "trequinquagintillion", "abbr": "Tqig", "exp": 162}, {"name": "quattuorquinquagintillion", "abbr": "Qaqig", "exp": 165}, {"name": "quinquinquagintillion", "abbr": "Qiqig", "exp": 168}, {"name": "sexquinquagintillion", "abbr": "Sxqig", "exp": 171}, {"name": "septenquinquagintillion", "abbr": "Spqig", "exp": 174}, {"name": "octoquinquagintillion", "abbr": "Ocqig", "exp": 177}, {"name": "novemquinquagintillion", "abbr": "Noqig", "exp": 180}, {"name": "sexagintillion", "abbr": "Sxg", "exp": 183}, {"name": "unsexagintillion", "abbr": "Usxg", "exp": 186}, {"name": "duosexagintillion", "abbr": "Dsxg", "exp": 189}, {"name": "tresexagintillion", "abbr": "Tsxg", "exp": 192}, {"name": "quattuorsexagintillion", "abbr": "Qasxg", "exp": 195}, {"name": "quinsexagintillion", "abbr": "Qisxg", "exp": 198}, {"name": "sexsexagintillion", "abbr": "Sxsxg", "exp": 201}, {"name": "septensexagintillion", "abbr": "Spsxg", "exp": 204}, {"name": "octosexagintillion", "abbr": "Ocsxg", "exp": 207}, {"name": "novemsexagintillion", "abbr": "Nosxg", "exp": 210}, {"name": "septuagintillion", "abbr": "Spg", "exp": 213}, {"name": "unseptuagintillion", "abbr": "Uspg", "exp": 216}, {"name": "duoseptuagintillion", "abbr": "Dspg", "exp": 219}, {"name": "treseptuagintillion", "abbr": "Tspg", "exp": 222}, {"name": "quattuorseptuagintillion", "abbr": "Qaspg", "exp": 225}, {"name": "quinseptuagintillion", "abbr": "Qispg", "exp": 228}, {"name": "sexseptuagintillion", "abbr": "Sxspg", "exp": 231}, {"name": "septenseptuagintillion", "abbr": "Spspg", "exp": 234}, {"name": "octoseptuagintillion", "abbr": "Ocspg", "exp": 237}, {"name": "novemseptuagintillion", "abbr": "Nospg", "exp": 240}, {"name": "octogintillion", "abbr": "Og", "exp": 243}, {"name": "unoctogintillion", "abbr": "Uog", "exp": 246}, {"name": "duooctogintillion", "abbr": "Dog", "exp": 249}, {"name": "treoctogintillion", "abbr": "Tog", "exp": 252}, {"name": "quattuoroctogintillion", "abbr": "Qaog", "exp": 255}, {"name": "quinoctogintillion", "abbr": "Qiog", "exp": 258}, {"name": "sexoctogintillion", "abbr": "Sxog", "exp": 261}, {"name": "septenoctogintillion", "abbr": "Spog", "exp": 264}, {"name": "octooctogintillion", "abbr": "Ocog", "exp": 267}, {"name": "novemoctogintillion", "abbr": "Noog", "exp": 270}, {"name": "nonagintillion", "abbr": "Ng", "exp": 273}, {"name": "unnonagintillion", "abbr": "Ung", "exp": 276}, {"name": "duononagintillion", "abbr": "Dng", "exp": 279}, {"name": "trenonagintillion", "abbr": "Tng", "exp": 282}, {"name": "quattuornonagintillion", "abbr": "Qang", "exp": 285}, {"name": "quinnonagintillion", "abbr": "Qing", "exp": 288}, {"name": "sexnonagintillion", "abbr": "Sxng", "exp": 291}, {"name": "septennonagintillion", "abbr": "Spng", "exp": 294}, {"name": "octononagintillion", "abbr": "Ocng", "exp": 297}, {"name": "novemnonagintillion", "abbr": "Nong", "exp": 300}];
+
+const suffixes = ["", "thousand", ...numberData.map(x => x.name)];
+
+const aliases = {
+  "k": 1,
+  "thousand": 1
+};
+
+// million starts at suffix index 2.
+numberData.forEach((item, i) => {
+  const suffixIndex = i + 2;
+  aliases[item.name.toLowerCase()] = suffixIndex;
+  aliases[item.abbr.toLowerCase()] = suffixIndex;
+});
+
+// A few extra familiar aliases.
+aliases["mil"] = 2;
+aliases["bil"] = 3;
+aliases["tril"] = 4;
+
+function parseCookieNumber(text) {
+  let s = text.trim().toLowerCase().replace(/,/g, "");
+  if (!s) return null;
+
+  const match = s.match(/^([0-9]*\.?[0-9]+)\s*([a-z]+)?$/);
+  if (!match) return NaN;
+
+  const number = Number(match[1]);
+  const suffix = match[2] || "";
+
+  if (!suffix) return number;
+
+  const index = aliases[suffix];
+  if (index === undefined) return NaN;
+
+  return number * Math.pow(1000, index);
+}
+
+function formatCookieNumber(value) {
+  if (!Number.isFinite(value)) return "Infinity";
+  if (value < 1000) return value.toFixed(3);
+
+  let index = Math.floor(Math.log10(value) / 3);
+
+  if (index >= suffixes.length) {
+    return value.toExponential(3);
+  }
+
+  const scaled = value / Math.pow(1000, index);
+  return scaled.toFixed(3) + " " + suffixes[index];
+}
+
+function update() {
+  const raw = document.getElementById("cps").value;
+  const cps = parseCookieNumber(raw);
+  const error = document.getElementById("error");
+  const normal = document.getElementById("normal");
+  const frenzy = document.getElementById("frenzy");
+
+  if (cps === null) {
+    error.textContent = "";
+    normal.textContent = "—";
+    frenzy.textContent = "—";
+    return;
+  }
+
+  if (!Number.isFinite(cps) || cps < 0) {
+    error.textContent = "I couldn't read that number. Try something like 1.362 million or 1.362M.";
+    normal.textContent = "—";
+    frenzy.textContent = "—";
+    return;
+  }
+
+  error.textContent = "";
+
+  const normalBank = cps * 12000;
+  const frenzyBank = normalBank * 7;
+
+  normal.textContent = formatCookieNumber(normalBank);
+  frenzy.textContent = formatCookieNumber(frenzyBank);
+}
+
+function buildReferenceList() {
+  const list = document.getElementById("referenceList");
+
+  numberData.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const name = document.createElement("div");
+    name.className = "number-name";
+    name.textContent = item.name;
+
+    const short = document.createElement("div");
+    short.className = "abbr";
+    short.textContent = item.abbr;
+
+    const power = document.createElement("div");
+    power.className = "power";
+    power.textContent = "10^" + item.exp;
+
+    row.append(name, short, power);
+    list.appendChild(row);
+  });
+}
+
+document.getElementById("cps").addEventListener("input", update);
+buildReferenceList();
+</script>
+</body>
+</html>
