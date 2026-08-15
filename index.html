@@ -30,7 +30,7 @@
       border-radius: 14px;
       padding: 24px;
       box-shadow: 0 12px 35px rgba(0,0,0,.35);
-      min-height: 570px;
+      min-height: 670px;
     }
 
     .calculator-card {
@@ -112,8 +112,8 @@
     .reference-card {
       display: flex;
       flex-direction: column;
-      min-height: 570px;
-      max-height: 570px;
+      min-height: 670px;
+      max-height: 670px;
     }
 
     .reference-head {
@@ -211,6 +211,11 @@
           <div class="name">Bank needed while CpS is ×7</div>
           <div id="frenzy" class="value">—</div>
         </div>
+
+        <div class="result">
+          <div class="name">Bank needed while CpS is ×666 (Elder Frenzy)</div>
+          <div id="elderFrenzy" class="value">—</div>
+        </div>
       </div>
 
 
@@ -218,7 +223,9 @@
         Normal threshold = CpS × 60 × 30 ÷ 0.15 =
         <strong>CpS × 12,000</strong><br>
         ×7 CpS threshold = normal threshold × 7 =
-        <strong>CpS × 84,000</strong>
+        <strong>CpS × 84,000</strong><br>
+        ×666 CpS threshold = normal threshold × 666 =
+        <strong>CpS × 7,992,000</strong>
       </div>
     </div>
 
@@ -310,11 +317,13 @@ function update() {
   const error = document.getElementById("error");
   const normal = document.getElementById("normal");
   const frenzy = document.getElementById("frenzy");
+  const elderFrenzy = document.getElementById("elderFrenzy");
 
   if (cps === null) {
     error.textContent = "";
     normal.textContent = "—";
     frenzy.textContent = "—";
+    elderFrenzy.textContent = "—";
     return;
   }
 
@@ -322,6 +331,7 @@ function update() {
     error.textContent = "I couldn't read that number. Try something like 1.362 million or 1.362M.";
     normal.textContent = "—";
     frenzy.textContent = "—";
+    elderFrenzy.textContent = "—";
     return;
   }
 
@@ -329,9 +339,11 @@ function update() {
 
   const normalBank = cps * 12000;
   const frenzyBank = normalBank * 7;
+  const elderFrenzyBank = normalBank * 666;
 
   normal.textContent = formatCookieNumber(normalBank);
   frenzy.textContent = formatCookieNumber(frenzyBank);
+  elderFrenzy.textContent = formatCookieNumber(elderFrenzyBank);
 }
 
 function buildReferenceList() {
